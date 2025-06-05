@@ -47,7 +47,16 @@ interface MajorPurchaseSimulationResults {
   comparisonData: SimulationDataPoint[];
 }
 
-type SimulationParams = CareerChangeFormValues | InvestmentStrategyFormValues | MajorPurchaseFormValues | null;
+type ScenarioParameterTypes = 
+  ReturnType<typeof CareerChangeForm> extends React.ReactElement<infer P> ? P['defaultValues'] : never |
+  ReturnType<typeof InvestmentStrategyForm> extends React.ReactElement<infer P> ? P['defaultValues'] & { 
+    currentStrategyName: string; currentStrategyReturn: number; newStrategyName: string; newStrategyReturn: number; 
+  } : never |
+  ReturnType<typeof MajorPurchaseForm> extends React.ReactElement<infer P> ? P['defaultValues'] : never;
+
+
+type SimulationParams = CareerChangeFormValues | (InvestmentStrategyFormValues & { currentStrategyName: string; currentStrategyReturn: number; newStrategyName: string; newStrategyReturn: number; }) | MajorPurchaseFormValues | null;
+
 type SimulationResults = CareerSimulationResults | InvestmentSimulationResults | MajorPurchaseSimulationResults | null;
 
 interface CareerDifferenceMetrics {
@@ -278,13 +287,13 @@ export function WhatIfClient() {
     setIsSimulating(false);
   };
 
-  const runInvestmentStrategySimulation = (params: InvestmentStrategyFormValues, baseFinancials: CurrentFinancialsSummary) => {
+  const runInvestmentStrategySimulation = (formValues: InvestmentStrategyFormValues, baseFinancials: CurrentFinancialsSummary) => {
     setIsSimulating(true);
     setError(null);
     setAiAnalysis(null);
-    setSimulationParams(params);
+    
 
-    const { monthlyInvestmentAmount, currentInvestmentStrategyValue, newInvestmentStrategyValue, yearsToSimulate } = params;
+    const { monthlyInvestmentAmount, currentInvestmentStrategyValue, newInvestmentStrategyValue, yearsToSimulate } = formValues;
 
     const currentStrategy = investmentStrategies.find(s => s.value === currentInvestmentStrategyValue);
     const newStrategy = investmentStrategies.find(s => s.value === newInvestmentStrategyValue);
@@ -295,17 +304,26 @@ export function WhatIfClient() {
       return;
     }
     
+    const fullScenarioParams = {
+        ...formValues,
+        currentStrategyName: currentStrategy.name,
+        currentStrategyReturn: currentStrategy.rate,
+        newStrategyName: newStrategy.name,
+        newStrategyReturn: newStrategy.rate,
+    };
+    setSimulationParams(fullScenarioParams);
+    
     const chartData: SimulationDataPoint[] = [];
     const yearByYearForAI: YearByYearProjection[] = [];
 
-    let currentStrategyValue = 0;
-    let newStrategyValue = 0;
+    let currentStrategyFV = 0;
+    let newStrategyFV = 0;
 
     for (let year = 1; year <= yearsToSimulate; year++) {
-      currentStrategyValue = calculateFVAnnuity(monthlyInvestmentAmount, currentStrategy.rate, year);
-      newStrategyValue = calculateFVAnnuity(monthlyInvestmentAmount, newStrategy.rate, year);
-      chartData.push({ year, currentPathValue: currentStrategyValue, newPathValue: newStrategyValue });
-      yearByYearForAI.push({ year, fdValue: currentStrategyValue, newStrategyValue: newStrategyValue});
+      currentStrategyFV = calculateFVAnnuity(monthlyInvestmentAmount, currentStrategy.rate, year);
+      newStrategyFV = calculateFVAnnuity(monthlyInvestmentAmount, newStrategy.rate, year);
+      chartData.push({ year, currentPathValue: currentStrategyFV, newPathValue: newStrategyFV });
+      yearByYearForAI.push({ year, fdValue: currentStrategyFV, newStrategyValue: newStrategyFV});
     }
     
     const totalInvestmentMade = monthlyInvestmentAmount * 12 * yearsToSimulate;
@@ -313,9 +331,9 @@ export function WhatIfClient() {
     setSimulationResults({ type: "investment", investmentGrowthData: chartData });
     setDifferenceMetrics({
         type: "investment",
-        currentStrategyFinalAmount: currentStrategyValue,
-        newStrategyFinalAmount: newStrategyValue,
-        finalAmountDifference: newStrategyValue - currentStrategyValue,
+        currentStrategyFinalAmount: currentStrategyFV,
+        newStrategyFinalAmount: newStrategyFV,
+        finalAmountDifference: newStrategyFV - currentStrategyFV,
         totalInvestmentMade: totalInvestmentMade,
         currentStrategyName: currentStrategy.name,
         currentStrategyReturnRate: currentStrategy.rate,
@@ -325,12 +343,12 @@ export function WhatIfClient() {
     });
     
     const aiSimulationProjections: InvestmentStrategyProjections = {
-      fdFinalAmount: currentStrategyValue,
-      newStrategyFinalAmount: newStrategyValue,
+      fdFinalAmount: currentStrategyFV,
+      newStrategyFinalAmount: newStrategyFV,
       totalInvestmentMade,
       yearByYearProjections: yearByYearForAI
     };
-    triggerAiAnalysis(params, aiSimulationProjections);
+    triggerAiAnalysis(fullScenarioParams, aiSimulationProjections);
     setIsSimulating(false);
   };
 
@@ -467,7 +485,7 @@ export function WhatIfClient() {
         totalDebt: currentFinancials.totalDebt,
       },
       scenarioType: activeScenario,
-      scenarioParameters: params as any, 
+      scenarioParameters: params as ScenarioParameterTypes, 
       simulationProjections: projections,
     };
 
@@ -743,7 +761,7 @@ export function WhatIfClient() {
             <CardTitle className="flex items-center"><LineChartIcon className="h-6 w-6 mr-2 text-primary"/>Simulation Results</CardTitle>
              {simulationParams && <CardDescription>
                 Scenario: {activeScenario === 'careerChange' ? `Career Change (Simulated over ${(simulationParams as CareerChangeFormValues).yearsToSimulate} years)` 
-                          : activeScenario === 'investmentStrategy' ? `Investment Strategy (Comparing over ${(simulationParams as InvestmentStrategyFormValues).yearsToSimulate} years)`
+                          : activeScenario === 'investmentStrategy' ? `Investment Strategy (Comparing over ${(simulationParams as InvestmentStrategyFormValues & { currentStrategyName: string; currentStrategyReturn: number; newStrategyName: string; newStrategyReturn: number; }).yearsToSimulate} years)`
                           : `Major Purchase (${(simulationParams as MajorPurchaseFormValues).purchaseType} over ${(simulationParams as MajorPurchaseFormValues).loanTenureYears} years)`}
             </CardDescription>}
           </CardHeader>
@@ -791,3 +809,4 @@ export function WhatIfClient() {
     </div>
   );
 }
+
