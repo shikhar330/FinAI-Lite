@@ -1,0 +1,167 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 180 50% 97%; /* Desaturated light cyan #F0FAFA */
+    --foreground: 190 20% 20%; /* Dark desaturated cyan */
+
+    --muted: 180 30% 90%;
+    --muted-foreground: 190 15% 40%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 190 20% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 190 20% 20%;
+
+    --border: 180 30% 85%;
+    --input: 180 30% 88%;
+
+    --primary: 190 60% 55%; /* Strong cyan #40BCD8 */
+    --primary-foreground: 190 60% 98%; /* Light color for text on primary */
+
+    --secondary: 180 40% 93%; /* Lighter cyan for secondary elements */
+    --secondary-foreground: 190 20% 20%;
+
+    --accent: 160 60% 55%; /* Teal #40D8A7 */
+    --accent-foreground: 160 60% 98%; /* Light color for text on accent */
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --ring: 190 60% 55%; /* Strong cyan #40BCD8 for rings */
+    --radius: 0.5rem;
+
+    --chart-1: 190 70% 50%; /* Variants of cyan/teal */
+    --chart-2: 170 60% 45%;
+    --chart-3: 160 80% 40%;
+    --chart-4: 200 75% 60%;
+    --chart-5: 180 65% 55%;
+
+    --sidebar-background: 180 45% 95%; /* Slightly darker than main background */
+    --sidebar-foreground: 190 20% 20%;
+    --sidebar-primary: 190 60% 55%;
+    --sidebar-primary-foreground: 190 60% 98%;
+    --sidebar-accent: 160 60% 55%;
+    --sidebar-accent-foreground: 160 60% 98%;
+    --sidebar-border: 180 30% 88%;
+    --sidebar-ring: 190 60% 55%;
+  }
+
+  .dark {
+    --background: 190 15% 10%; /* Dark cyan/blue */
+    --foreground: 180 30% 90%; /* Light desaturated cyan */
+
+    --muted: 190 15% 20%;
+    --muted-foreground: 180 25% 70%;
+
+    --popover: 190 15% 10%;
+    --popover-foreground: 180 30% 90%;
+
+    --card: 190 15% 15%;
+    --card-foreground: 180 30% 90%;
+
+    --border: 190 15% 25%;
+    --input: 190 15% 22%;
+
+    --primary: 190 60% 55%; /* Strong cyan #40BCD8 */
+    --primary-foreground: 190 15% 15%; /* Darker text on primary */
+
+    --secondary: 190 15% 25%;
+    --secondary-foreground: 180 30% 90%;
+
+    --accent: 160 60% 55%; /* Teal #40D8A7 */
+    --accent-foreground: 160 15% 15%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --ring: 190 60% 55%;
+    
+    --chart-1: 190 70% 60%;
+    --chart-2: 170 60% 55%;
+    --chart-3: 160 80% 50%;
+    --chart-4: 200 75% 70%;
+    --chart-5: 180 65% 65%;
+
+    --sidebar-background: 190 15% 12%;
+    --sidebar-foreground: 180 30% 90%;
+    --sidebar-primary: 190 60% 55%;
+    --sidebar-primary-foreground: 190 15% 15%;
+    --sidebar-accent: 160 60% 55%;
+    --sidebar-accent-foreground: 160 15% 15%;
+    --sidebar-border: 190 15% 20%;
+    --sidebar-ring: 190 60% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact; /* Chrome, Safari */
+    print-color-adjust: exact; /* Firefox */
+  }
+  body * {
+    visibility: hidden;
+    box-shadow: none !important;
+    border-color: #ccc !important; /* Make borders visible for print */
+  }
+  /* General content intended for print should be wrapped in a div with class .print-visible-content */
+  .print-visible-content, .print-visible-content * {
+    visibility: visible;
+  }
+  .print-visible-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 20px !important; 
+    margin: 0 !important; 
+  }
+  main.p-4, main.p-6, main.p-8 { 
+    padding: 0 !important;
+  }
+  /* Hide elements not meant for printing */
+  .print-hidden, 
+  header[class*="MainHeader"], 
+  div[data-sidebar-provider] > aside[class*="Sidebar-module"], 
+  aside[class*="sidebar-module"], 
+  nav[class*="SidebarNav-module"],
+  div[class*="Toaster"] 
+  {
+    display: none !important;
+  }
+  /* Ensure cards and text within printable area are styled for readability */
+  .print-visible-content .card {
+    border: 1px solid #eee !important;
+    page-break-inside: avoid;
+  }
+  .print-visible-content h1, .print-visible-content h2, .print-visible-content h3, .print-visible-content h4, .print-visible-content p, .print-visible-content div, .print-visible-content span {
+    color: #333 !important; 
+  }
+  .print-visible-content .prose { 
+    color: #333 !important;
+  }
+  .print-visible-content .prose code { 
+     background-color: #f5f5f5 !important;
+     color: #333 !important;
+     border: 1px solid #ddd !important;
+  }
+}
+
