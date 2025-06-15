@@ -127,41 +127,103 @@ body {
     visibility: visible;
   }
   .print-visible-content {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
+    position: absolute !important; /* Ensure it takes over the page */
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
     padding: 20px !important; 
     margin: 0 !important; 
+    overflow: visible !important; /* Ensure all content is shown */
+    background-color: white !important; /* Ensure background is white for printing */
   }
-  main.p-4, main.p-6, main.p-8 { 
+
+  /* Reset padding/margin for main containers to avoid interference */
+  main.p-4, main.p-6, main.p-8,
+  div[class*="SidebarInset"] > main { /* More specific selector for main within sidebar structure */
     padding: 0 !important;
+    margin: 0 !important;
   }
+
   /* Hide elements not meant for printing */
   .print-hidden, 
   header[class*="MainHeader"], 
-  div[data-sidebar-provider] > aside[class*="Sidebar-module"], 
-  aside[class*="sidebar-module"], 
-  nav[class*="SidebarNav-module"],
-  div[class*="Toaster"] 
+  div[data-sidebar-provider] > aside, /* More robust sidebar hiding */
+  aside[data-sidebar="sidebar"],
+  nav[class*="SidebarNav"],
+  div[class*="Toaster"],
+  button, /* Hide all buttons by default unless they are part of print-visible-content and explicitly styled */
+  .print-visible-content .print-hidden /* If a print-hidden element is inside print-visible, still hide it */
   {
     display: none !important;
   }
+
+  /* Ensure buttons *within* the report meant for actions (like a close button inside the report component if not for printing) are hidden */
+  .print-visible-content button.print-hidden {
+      display: none !important;
+  }
+
+
   /* Ensure cards and text within printable area are styled for readability */
   .print-visible-content .card {
     border: 1px solid #eee !important;
     page-break-inside: avoid;
+    box-shadow: none !important;
+    background-color: white !important;
   }
-  .print-visible-content h1, .print-visible-content h2, .print-visible-content h3, .print-visible-content h4, .print-visible-content p, .print-visible-content div, .print-visible-content span {
-    color: #333 !important; 
+  .print-visible-content h1, 
+  .print-visible-content h2, 
+  .print-visible-content h3, 
+  .print-visible-content h4, 
+  .print-visible-content h5,
+  .print-visible-content p, 
+  .print-visible-content div, 
+  .print-visible-content span,
+  .print-visible-content li,
+  .print-visible-content th,
+  .print-visible-content td {
+    color: #000 !important; /* Ensure text is black for print */
+    background-color: transparent !important; /* Avoid colored backgrounds on text elements */
   }
   .print-visible-content .prose { 
-    color: #333 !important;
+    color: #000 !important;
   }
   .print-visible-content .prose code { 
      background-color: #f5f5f5 !important;
-     color: #333 !important;
+     color: #000 !important;
      border: 1px solid #ddd !important;
   }
+  .print-visible-content table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+  .print-visible-content th, .print-visible-content td {
+    border: 1px solid #ccc !important;
+    padding: 4px 8px !important;
+  }
+  .print-visible-content .text-primary {
+    color: #000 !important; /* Override theme colors for print if necessary */
+  }
+  .print-visible-content .text-muted-foreground {
+    color: #333 !important;
+  }
+  .print-visible-content .bg-muted\/40 { /* Example to target specific background colors */
+    background-color: #f9f9f9 !important;
+  }
+
+  /* Remove Dialog specific styles that might interfere with print */
+  div[role="dialog"] {
+    position: static !important; /* Override fixed positioning for dialog */
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+  div[role="dialog"] > .print-visible-content {
+    position: static !important; /* Let content flow normally */
+  }
 }
+
 

@@ -22,14 +22,15 @@ import {
   MessageSquareHeart,
   Settings,
   Target,
-  // Removed FileText icon
+  CalendarClock, // Added CalendarClock
 } from 'lucide-react';
-import { cn } from '@/lib/utils'; // Import cn utility
+import { cn } from '@/lib/utils'; 
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/finances', label: 'Update Finances', icon: Landmark },
   { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/bill-tracker', label: 'Bill Reminders', icon: CalendarClock }, // Added Bill Reminders
   { href: '/what-if', label: 'What-If Scenarios', icon: HelpCircle },
   { href: '/goal-setting', label: 'Financial Goals', icon: Target },
   { href: '/financial-advice', label: 'AI Advisor', icon: MessageSquareHeart },
@@ -48,8 +49,8 @@ export function SidebarNav() {
   return (
     <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader className={cn(
-          "flex items-center", // Base styles
-          (open || isMobile) ? "p-4 justify-start" : "p-2 justify-center" // Dynamic padding and justification
+          "flex items-center", 
+          (open || isMobile) ? "p-4 justify-start" : "p-2 justify-center" 
         )}>
         <AppLogo showText={open || isMobile} />
       </SidebarHeader>
@@ -64,7 +65,7 @@ export function SidebarNav() {
                   onClick={handleLinkClick}
                 >
                   <item.icon className="h-5 w-5" />
-                  {/* Updated className for the span */}
+                  
                   <span className={(isMobile || open) ? 'inline-block' : 'hidden'}>{item.label}</span>
                 </SidebarMenuButton>
               </Link>
@@ -82,7 +83,7 @@ export function SidebarNav() {
                   onClick={handleLinkClick}
                 >
                   <Settings className="h-5 w-5" />
-                   {/* Updated className for the span */}
+                   
                   <span className={(isMobile || open) ? 'inline-block' : 'hidden'}>Settings</span>
                 </SidebarMenuButton>
               </Link>

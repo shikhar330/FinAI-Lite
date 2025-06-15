@@ -1,7 +1,22 @@
-// This page component is a placeholder as the "Bill Tracker" feature has been removed.
-// It returns null to prevent rendering errors if this route is somehow accessed.
-// Ideally, this route and file should be fully removed if not needed by the routing system.
 
-export default function BillTrackerPage() {
-  return null;
+'use client';
+
+import { BillTrackerClient } from '@/components/bill-tracker/BillTrackerClient';
+import { PageHeader } from '@/components/shared/PageHeader';
+import { CalendarClock } from 'lucide-react';
+import withAuth from '@/components/auth/withAuth';
+
+function BillTrackerPage() {
+  return (
+    <div className="space-y-8">
+      <PageHeader
+        title="Bill Tracker & Reminders"
+        description="Stay on top of your upcoming bills, payments, and due dates."
+        icon={CalendarClock}
+      />
+      <BillTrackerClient />
+    </div>
+  );
 }
+
+export default withAuth(BillTrackerPage);
